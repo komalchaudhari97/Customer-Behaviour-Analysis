@@ -1,0 +1,130 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+```{r}
+install.packages("dplyr")
+install.packages("ggplot")
+install.packages("rpart")
+install.packages("rpart.plot")
+install.packages("lubridate")
+library(rpart)
+library(rpart.plot)
+install.packages("readxl")
+library(readxl)
+library(lubridate)
+install.packages("e1071")
+library(e1071)
+```
+
+```{r}
+setwd("C:/NIU OMIS 2022_2023/Fall 2023/665 Big Data/Project Submission")
+Data <- read_excel("CBD.xlsx")
+View(Data)
+```
+
+
+```{r}
+#Save the data back to the folder
+install.packages("writexl")
+library(writexl)
+write_xlsx(mydata, path = "CBD_output_file.xlsx")
+
+```
+
+
+```{r}
+# Calculate customer age and create a new column 'Age'
+Data$Age <- 2023 - Data$Year_Birth
+```
+
+```{r}
+# Create a new column 'Age_Group' based on the 'Age' column
+Data$Age_Group <- cut(Data$Age, 
+                      breaks = c(13, 19, 55, 150), 
+                      labels = c("Teenager", "Adult", "Senior Citizen"),
+                      include.lowest = TRUE)
+```
+
+```{r}
+# Calculate total amount spent and create a new column 'Amt_Spend'
+Data$Amt_Spend <- Data$Wines + Data$Fruits + Data$MeatProducts +
+  Data$FishProducts + Data$SweetProducts + Data$GoldProds
+```
+
+
+```{r}
+#rearranging the columns
+
+desired_column_order <- c("ID", "Year_Birth","Age", "Age_Group", "Education", "Marital_Status", "Income","Amt_Spend", 
+                          "Has_Kid", "Has_Teen", "Dt_Customer", "Recency", 
+                          "Wines", "Fruits", "MeatProducts", "FishProducts", 
+                          "SweetProducts", "GoldProds", "NumDealsPurchases", 
+                          "NumWebPurchases", "NumCatalogPurchases", "NumStorePurchases", 
+                          "NumWebVisitsMonth", "AcceptedCmp3", "AcceptedCmp4", 
+                          "AcceptedCmp5", "AcceptedCmp1", "AcceptedCmp2", "Complain", 
+                          "Z_CostContact", "Z_Revenue", "Response")
+
+mydata <- Data[, desired_column_order]
+View(mydata)
+```
+
+```{r}
+# Created a new column Enrollment_Age in years using Dt_Customer and Birth_Year 
+mydata$Dt_Customer <- as.Date(mydata$Dt_Customer)
+# Extract the year from 'Dt_Customer'
+enrollment_year <- format(mydata$Dt_Customer, "%Y")
+# Calculate Enrollment Age in years
+mydata$Enrollment_Age <- as.numeric(enrollment_year)- mydata$Year_Birth 
+head(mydata)
+
+```
+
+
+```{r}
+#describe the dataset (e.g., structure, no. of variables, types of variables)
+str(mydata)
+```
+```{r}
+#b)	describe key variables (e.g., descriptive statistical measures)
+summary(mydata)
+
+#Calculating the mean income, age, spend 
+mean_income <- mean(mydata$Income)
+mean_age <- mean(mydata$Age)
+mean_spent <- mean(mydata$Amt_Spend)
+mean_enrollment_age <- mean(mydata$Enrollment_Age)
+print(mean_income)
+print(mean_age)
+print(mean_spent)
+print(mean_enrollment_age)
+
+```
+
+```{r}
+#Descriptive Statistical Measures in R from ppt Lc05 slide 19
+#used lib- install.packages("e1071")
+#library(e1071)
+
+kurtosis_value <- kurtosis(mydata$Age)
+print(paste("Kurtosis for Age:", kurtosis_value))
+
+#hist(mydata$Income)
+hist(mydata$Income, main = "Income Distribution", xlab = "Income")
+
+plot(mydata$Income, mydata$Amt_Spend)
+
+cor(mydata$Enrollment_Age, mydata$Amt_Spend)
+
+```
+
+
+```{r}
+#visualize key variables (e.g., distribution, relationships)
+
+hist(mydata$Income, main = "Income Distribution", xlab = "Income")
+
+```
+
